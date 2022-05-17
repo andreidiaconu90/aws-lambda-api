@@ -1,0 +1,79 @@
+stages:
+  - build-test
+  - dev-deploy
+  # - test-deploy
+  # - prod-deploy
+variables:
+  SERVICE_NAME: tt-lambda-nodejs-boilerplate
+
+.deployment_script: &deployment_script
+  image: docker.gitlab.prod.aws.scania.com/ted/docker/serverlessframework:latest
+  only:
+    - master
+  tags:
+    - te-generic
+  before_script:
+    - assume -a ${AWSACCOUNTNO} -r ${DEPLOYROLENAME} -e ${DEPLOYROLE_EXTERNALID} 
+
+build-test:
+  stage: build-test
+  <<: *deployment_script
+  environment:
+    name: dev
+  variables:
+    DEPLOYROLE_EXTERNALID: ${DEPLOYROLE_EXTERNALID_DEV}
+    AWSACCOUNTNO: ${AWSACCOUNTNO_DEV}
+  script:
+    - pwd
+    - npm install
+    - npm audit
+    # Example for lambda layer dependency
+    # - export SLS_DEBUG=*
+    # - mkdir -p /opt/nodejs/node_modules/assetmodel
+    # - cd /shared/assetmodel
+    # - cp -r `ls -A | grep -v "node_modules"` /opt/nodejs/node_modules/assetmodel
+    # - cd /builds/ted/orbcomm/administration/tt-lambda-nodejs-boilerplate
+    # - cp -r /shared/assetmodel/node_modules/. /opt/nodejs/node_modules
+    - npm run typescript-compile
+    - npm run lint
+    - npm run test
+  artifacts:
+    paths:
+    - js
+    - node_modules
+    - serverless.yml
+    - package.json
+
+dev-deploy:
+  stage: dev-deploy
+  <<: *deployment_script
+  environment:
+    name: dev
+  variables:
+    DEPLOYROLE_EXTERNALID: ${G_AWS_DEPLOY_ROLE_EXTERNAL_ID_DEV}
+    AWSACCOUNTNO: ${G_AWS_ACCOUNT_ID_DEV}
+  script:
+    - serverless deploy --stage dev --region eu-west-1 --domain te.csawsdev.net --verbose --conceal --aws-profile deployprofile
+
+# test-deploy:
+#   stage: test-deploy
+#   <<: *deployment_script
+#   environment:
+#     name: test
+#   variables:
+#     DEPLOYROLE_EXTERNALID: ${DEPLOYROLE_EXTERNALID_TEST}
+#     AWSACCOUNTNO: ${AWSACCOUNTNO_TEST}
+#   script:
+#     - serverless deploy --stage test --region eu-west-1 --domain testapite.cs.scania.com --verbose --conceal --aws-profile deployprofile
+
+# prod-deploy:
+#   stage: prod-deploy
+#   <<: *deployment_script
+#   environment:
+#     name: prod
+#   variables:
+#     DEPLOYROLE_EXTERNALID: ${DEPLOYROLE_EXTERNALID_PROD}
+#     AWSACCOUNTNO: ${AWSACCOUNTNO_PROD}
+#   script:
+#     - serverless deploy --stage prod --region eu-west-1 --domain apite.cs.scania.com --verbose --conceal --aws-profile deployprofile
+#   when: manual

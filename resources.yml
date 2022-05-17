@@ -1,0 +1,78 @@
+Resources:
+  MoviesTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: SK
+          AttributeType: S
+        - AttributeName: Name
+          AttributeType: S
+      GlobalSecondaryIndexes:
+        - IndexName: M2MIndex
+          KeySchema:
+            - AttributeName: SK
+              KeyType: HASH
+            - AttributeName: PK
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
+        - IndexName: NameIndex
+          KeySchema:
+            - AttributeName: Name
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
+      BillingMode: PROVISIONED
+      TableName: MoviesTable
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+
+IamRoleLambdaExecution:
+  Type: 'AWS::IAM::Role'
+  Properties:
+    Path: /
+    AssumeRolePolicyDocument:
+      Version: '2012-10-17'
+      Statement:
+        - Effect: Allow
+          Principal:
+            Service: 
+              - events.amazonaws.com
+              - lambda.amazonaws.com
+          Action:
+            - sts:AssumeRole
+    Policies:
+      #TODO: Change the policy name accordingly to the service name
+      - PolicyName: !Sub tt-lambda-nodejs-boilerplate-${opt:stage}-lambda
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - logs:CreateLogStream
+                - logs:CreateLogGroup
+                - logs:PutLogEvents
+                - 'dynamodb:BatchGetItem'
+                - 'dynamodb:BatchWriteItem'
+                - 'dynamodb:PutItem'
+                - 'dynamodb:DeleteItem'
+                - 'dynamodb:GetItem'
+                - 'dynamodb:Scan'
+                - 'dynamodb:Query'
+                - 'dynamodb:UpdateItem'
+                - 'dynamodb:PartiQL*'
+              Resource: '*'

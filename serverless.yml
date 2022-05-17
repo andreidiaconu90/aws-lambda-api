@@ -1,0 +1,53 @@
+service: tt-lambda-nodejs-boilerplate
+
+
+provider:
+    name: aws
+    runtime: nodejs12.x
+    stage: ${opt:stage, 'dev'}
+    logRetentionInDays: 7
+    environment: ${file(env.yml):${opt:stage}}
+    timeout: 30
+    lambdaHashingVersion: 20201221
+
+plugins:
+    - serverless-webpack
+    - serverless-offline
+
+custom:
+    webpack:
+        webpackConfig: ./webpack.config.js
+        packager: npm
+    localresourcesprefix:
+        local: "offline/"
+        other: ""
+
+functions:
+    getMovies:
+        handler: js/handlers/GetMovies.handler
+        role: IamRoleLambdaExecution
+        events:
+           - http:
+              path: movies
+              method: get
+              cors: true
+    getMovieByName:
+        handler: js/handlers/GetMovieByName.handler
+        role: IamRoleLambdaExecution
+        events:
+           - http:
+              path: movies/{s}
+              method: get
+              cors: true
+
+resources:
+    Resources: ${file(${self:custom.localresourcesprefix.${opt:stage}, self:custom.localresourcesprefix.other}resources.yml)}
+
+package:
+    individually: true
+    exclude:
+        - src/**
+        - .vscode/**
+        - .vs/**
+        - node_modules/@aws/**
+        - offline/**
