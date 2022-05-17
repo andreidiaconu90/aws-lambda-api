@@ -19,7 +19,8 @@ The application should start on `http://localhost:3000`
 ## URLs:
 
 │ GET | http://localhost:3000/dev/movies     │
-│ GET | http://localhost:3000/dev/movies/{s} │      
+
+│ GET | http://localhost:3000/dev/movies/Avengers: Infinity War │
 
 
 ## DynamoDb
