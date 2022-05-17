@@ -8,7 +8,6 @@ import IMovieService from "../interfaces/IMovieService";
 exports.handler = async (event: APIGatewayEvent) => {
     const movieService = DemoContainer.get<IMovieService>(SERVICE_IDENTIFIERS.IMovieService);
     const movieResponse = await movieService.getMovies();
-    console.log(`response is ${JSON.stringify(movieResponse)}`);
     if (movieResponse) {
         return {
             body: JSON.stringify(movieResponse),

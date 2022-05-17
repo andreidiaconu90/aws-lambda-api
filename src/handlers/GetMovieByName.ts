@@ -14,11 +14,8 @@ exports.handler = async (event: APIGatewayEvent) => {
     }
     const movieService = DemoContainer.get<IMovieService>(SERVICE_IDENTIFIERS.IMovieService);
     const { s: searchString } = event.pathParameters;
-    console.log(`Received query is: ${JSON.stringify(event.pathParameters)}`);
-    console.log(`Extracted movies query: ${searchString}`);
 
     const movieResponse = await movieService.getMovieByName(searchString);
-    console.log(`response is ${JSON.stringify(movieResponse)}`);
 
     if (movieResponse) {
         return {

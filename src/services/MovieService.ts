@@ -28,7 +28,7 @@ class MovieService implements IMovieService {
         if (moviesResponse.Count === 0) {
             return [];
         }
-
+        console.log(`TEST: ${JSON.stringify(moviesResponse)}`);
         const response: MovieDetails[] = [];
         const movieDetailsRawResponse = moviesResponse.Items as MoviesRawResponse[];
 

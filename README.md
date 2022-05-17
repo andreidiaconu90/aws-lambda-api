@@ -14,6 +14,9 @@ Run the following commands:
 2) `npm run docker-init`
 3) `npm run start`
 
+# Run tests
+`npm run test`, the only test is failing on assertion but there's a console.log in the live code showing that the mocking works. Search for `TEST: {` in the Terminal after you've run the tests.
+
 The application should start on `http://localhost:3000`
 
 ## URLs:
