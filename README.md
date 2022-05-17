@@ -10,8 +10,9 @@
 ## First time run
 
 Run the following commands:
-1) `npm run docker-init`
-2) `npm run start`
+1) `npm install`
+2) `npm run docker-init`
+3) `npm run start`
 
 The application should start on `http://localhost:3000`
 

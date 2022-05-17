@@ -6,7 +6,7 @@
     "scripts": {
         "start": "./node_modules/.bin/serverless offline --stage dev --region eu-west-1",
         "typescript-compile": "./node_modules/.bin/tsc",
-        "test": "nyc mocha --timeout 10000 -r ts-node/register src/**/*.spec.ts",
+        "test": "nyc mocha  -r ts-node/register src/**/*.spec.ts",
         "lint": "eslint -c .eslintrc.json --ext .ts src",
         "deploy-dev": "serverless deploy --stage dev --region eu-west-1",
         "docker-init": "docker compose up -d"

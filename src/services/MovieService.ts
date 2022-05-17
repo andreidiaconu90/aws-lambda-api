@@ -1,13 +1,13 @@
 import { injectable, inject } from "inversify";
-import IMovieService from "../interfaces/IMovieService";
 import { DynamoDB } from "aws-sdk";
-import IDynamoDbRepository from "../interfaces/IDynamoDbRepository";
-import SERVICE_IDENTIFIERS from "../containers/ServiceIdentifiers";
 import { MovieDetails } from "../models/MovieDetails";
 import { ActorDetails } from "../models/ActorDetails";
 import { DirectorDetails } from "../models/DirectorDetails";
 import { MoviesRawResponse } from "../models/MoviesRawResponse";
 import { CastRawResponse } from "../models/CastRawResponse";
+import SERVICE_IDENTIFIERS from "../containers/ServiceIdentifiers";
+import IMovieService from "../interfaces/IMovieService";
+import IDynamoDbRepository from "../interfaces/IDynamoDbRepository";
 import IDynamoDbQueryBuilder from "../interfaces/IDynamoDbQueryBuilder";
 
 @injectable()
@@ -49,7 +49,6 @@ class MovieService implements IMovieService {
         if (getMovieByNameResponse.Count === 0) {
             return null;
         }
-
         const movieDetailsRawResponse = getMovieByNameResponse.Items[0] as MoviesRawResponse;
 
         const castDetails = await this.getMovieCast(movieDetailsRawResponse.SK);
@@ -60,12 +59,7 @@ class MovieService implements IMovieService {
     }
 
     private async getMovieCast(PK: string): Promise<MovieDetails> {
-        const documentClient = new DynamoDB.DocumentClient({
-            endpoint: "http://localhost:8000",
-            accessKeyId: "1111",
-            secretAccessKey: "22222",
-        });
-        const getMovieCastByIdResponse = await documentClient.query(this.queryBuilder.buildPkEqualsQuery(PK)).promise();
+        const getMovieCastByIdResponse = await this.dynamoDbRepository.queryItems(this.queryBuilder.buildPkEqualsQuery(PK));
         const movieCastRawResponse = getMovieCastByIdResponse.Items as CastRawResponse[];
 
         const movieCast: MovieDetails = {
